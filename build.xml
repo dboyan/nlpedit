@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<project name="nlpdep" default="compile">
+	<target name="clean">
+		<delete dir="build" />
+	</target>
+
+	<target name="compile" depends="clean">
+		<mkdir dir="build/classes" />
+		<javac srcdir="src" destdir="build/classes" classpath="build/classes;../stanford" />
+	</target>
+
+	<target name="run" depends="compile">
+		<java classname="ParserDemo">
+			<classpath>
+				<pathelement path="build/classes" />
+				<pathelement path="../stanford" />
+			</classpath>
+		</java>
+	</target>
+</project>
+
