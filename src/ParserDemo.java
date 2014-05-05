@@ -16,7 +16,7 @@ import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 public class ParserDemo {
 
   public static void main(String[] args) {
-    LexicalizedParser lp = LexicalizedParser.loadModel("../../englishPCFG.ser.gz");
+    LexicalizedParser lp = LexicalizedParser.loadModel("englishPCFG.ser.gz");
     if (args.length > 0) {
       demoDP(lp, args[0]);
     } else {

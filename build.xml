@@ -14,6 +14,7 @@
 			<classpath>
 				<pathelement path="build/classes" />
 				<pathelement path="../stanford" />
+				<pathelement path="../resources" />
 			</classpath>
 		</java>
 	</target>
