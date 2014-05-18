@@ -1,22 +1,21 @@
 <?xml version="1.0"?>
 <project name="nlpdep" default="compile">
-	<target name="clean">
-		<delete dir="build" />
-	</target>
-
-	<target name="compile" depends="clean">
+	<target name="compile">
 		<mkdir dir="build/classes" />
-		<javac srcdir="src" destdir="build/classes" classpath="build/classes;../stanford" />
+		<javac srcdir="src" destdir="build/classes" classpath="build/classes" />
 	</target>
 
-	<target name="run" depends="compile">
-		<java classname="ParserDemo">
-			<classpath>
-				<pathelement path="build/classes" />
-				<pathelement path="../stanford" />
-				<pathelement path="../resources" />
-			</classpath>
-		</java>
+	<target name="jar">
+		<mkdir dir="build/jar"/>
+		<jar destfile="build/jar/nlpdep.jar" basedir="build/classes">
+			<manifest>
+				<attribute name="Main-Class" value="org.dby.nlpdep.ui.NLPTreeEx"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="run">
+		<java jar="build/jar/nlpdep.jar" fork="true"/>
 	</target>
 </project>
 
