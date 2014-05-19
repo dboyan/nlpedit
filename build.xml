@@ -9,7 +9,7 @@
 		<mkdir dir="build/jar"/>
 		<jar destfile="build/jar/nlpdep.jar" basedir="build/classes">
 			<manifest>
-				<attribute name="Main-Class" value="org.dby.nlpdep.ui.NLPTreeEx"/>
+				<attribute name="Main-Class" value="nlpedit.ui.NLPTreeEx"/>
 			</manifest>
 		</jar>
 	</target>

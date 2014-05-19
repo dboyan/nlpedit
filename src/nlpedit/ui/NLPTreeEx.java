@@ -1,4 +1,4 @@
-package org.dby.nlpdep.ui;
+package nlpedit.ui;
 
 import java.io.StringReader;
 import javax.swing.JFrame;
