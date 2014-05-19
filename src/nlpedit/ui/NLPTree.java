@@ -35,16 +35,18 @@ public class NLPTree extends JTree {
 		super(new NLPTreeModel(node));
 		getSelectionModel().setSelectionMode(
 			TreeSelectionModel.SINGLE_TREE_SELECTION);
-		DefaultTreeCellRenderer renderer = new NLPRenderer();
-		Icon nodeIcon = null;
-		renderer.setLeafIcon(nodeIcon);
-		renderer.setClosedIcon(nodeIcon);
-		renderer.setOpenIcon(nodeIcon);
-		setCellRenderer(renderer);
+		setCellRenderer(new NLPRenderer());
 	}
 }
 
 class NLPRenderer extends DefaultTreeCellRenderer {
+	public NLPRenderer() {
+		Icon nodeIcon = null;
+		setLeafIcon(nodeIcon);
+		setClosedIcon(nodeIcon);
+		setOpenIcon(nodeIcon);
+	}
+
 	public Component getTreeCellRendererComponent(
 			JTree tree,
 			Object value,
