@@ -41,7 +41,6 @@ public class NLPTree extends JTree {
 		super(new DefaultTreeModel(new NLPTreeNode(root)));
 		getSelectionModel().setSelectionMode(
 			TreeSelectionModel.SINGLE_TREE_SELECTION);
-		setCellRenderer(new NLPRenderer());
 		setEditable(true);
 	}
 
@@ -65,24 +64,3 @@ public class NLPTree extends JTree {
 	}
 }
 
-class NLPRenderer extends DefaultTreeCellRenderer {
-	public NLPRenderer() {
-		Icon nodeIcon = null;
-		setLeafIcon(nodeIcon);
-		setClosedIcon(nodeIcon);
-		setOpenIcon(nodeIcon);
-	}
-
-	public Component getTreeCellRendererComponent(
-			JTree tree,
-			Object value,
-			boolean sel,
-			boolean expanded,
-			boolean leaf,
-			int row,
-			boolean hasFocus) {
-		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-
-		return this;
-			}
-}
