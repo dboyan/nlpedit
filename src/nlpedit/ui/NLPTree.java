@@ -21,21 +21,47 @@ package nlpedit.ui;
 
 import javax.swing.Icon;
 import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.Component;
+import java.io.StringReader;
+import java.io.IOException;
 
 import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.PennTreeReader;
+import edu.stanford.nlp.trees.LabeledScoredTreeFactory;
+import edu.stanford.nlp.trees.LabeledScoredTreeNode;
+import edu.stanford.nlp.ling.StringLabelFactory;
 
 public class NLPTree extends JTree {
-	private NLPTreeModel model;
-
-	public NLPTree(Tree node) {
-		super(new NLPTreeModel(node));
+	public NLPTree(Tree root) {
+		super(new DefaultTreeModel(new NLPTreeNode(root)));
 		getSelectionModel().setSelectionMode(
 			TreeSelectionModel.SINGLE_TREE_SELECTION);
 		setCellRenderer(new NLPRenderer());
+		setEditable(true);
+	}
+
+	public void setTree(Tree root) {
+		setModel(new DefaultTreeModel(new NLPTreeNode(root)));
+	}
+
+	public String getTreeString() {
+		NLPTreeNode p = (NLPTreeNode)treeModel.getRoot();
+		return p.getTreeString();
+	}
+
+	public Tree getTree() {
+		Tree tree = new LabeledScoredTreeNode();
+		try {
+		tree = (new PennTreeReader(new StringReader(getTreeString()), new LabeledScoredTreeFactory(new StringLabelFactory()))).readTree();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return tree;
 	}
 }
 
@@ -56,8 +82,6 @@ class NLPRenderer extends DefaultTreeCellRenderer {
 			int row,
 			boolean hasFocus) {
 		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-		Tree p = (Tree)value;
-		setText(p.value());
 
 		return this;
 			}
