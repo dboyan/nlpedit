@@ -44,6 +44,10 @@ public class NLPTree extends JTree {
 		setEditable(true);
 	}
 
+	public NLPTree(){
+		setEditable(true);
+	}
+
 	public void setTree(Tree root) {
 		setModel(new DefaultTreeModel(new NLPTreeNode(root)));
 	}
