@@ -14,13 +14,16 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 import edu.stanford.nlp.parser.lexparser.LexicalizedParserQuery;
+import edu.stanford.nlp.parser.ui.TreeJPanel;
 
 public class NLPTreeEx extends JFrame {
 	private NLPTree tree;
 	private JButton parseButton;
 	private JButton updateTextButton;
+	private JButton updateGraphButton;
 	private JTextArea sentArea;
 	private JTextArea treeArea;
+	private TreeJPanel treeGraph;
 	private LexicalizedParser lp;
 	private LexicalizedParserQuery lpq;
 	private TokenizerFactory<CoreLabel> tokenizerFactory;
@@ -49,13 +52,19 @@ public class NLPTreeEx extends JFrame {
 		treeArea.setText(tree.getTreeString());
 	}
 
+	private void updateGraph() {
+		treeGraph.setTree(tree.getTree());
+	}
+
 	private void initComponents() {
 		JPanel buttonPanel = new JPanel();
 		parseButton = new JButton("parse");
 		updateTextButton = new JButton("update text");
+		updateGraphButton = new JButton("update graph");
 		tree = new NLPTree();
 		sentArea = new JTextArea(5, 40);
 		treeArea = new JTextArea(5, 40);
+		treeGraph = new TreeJPanel();
 
 		sentArea.setLineWrap(true);
 		treeArea.setLineWrap(true);
@@ -64,6 +73,7 @@ public class NLPTreeEx extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				parseSentence();
 				updateText();
+				updateGraph();
 			}
 		});
 
@@ -73,20 +83,34 @@ public class NLPTreeEx extends JFrame {
 			}
 		});
 
-		Container contentPane = getContentPane();
+		updateGraphButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updateGraph();
+			}
+		});
 
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+		JPanel leftPanel = new JPanel();
+
+		leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
 
 		buttonPanel.add(parseButton);
 		buttonPanel.add(updateTextButton);
-		contentPane.add(buttonPanel);
+		buttonPanel.add(updateGraphButton);
+		leftPanel.add(buttonPanel);
 
-		contentPane.add(sentArea);
+		leftPanel.add(sentArea);
 
 		JScrollPane treeScroll = new JScrollPane(tree);
-		contentPane.add(treeScroll);
+		leftPanel.add(treeScroll);
 
-		contentPane.add(treeArea);
+		leftPanel.add(treeArea);
+
+		JScrollPane graphScroll = new JScrollPane(treeGraph);
+
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, graphScroll);
+
+		add(splitPane);
+
 		pack();
 	}
 
