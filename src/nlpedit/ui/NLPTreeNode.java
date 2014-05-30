@@ -15,6 +15,10 @@ public class NLPTreeNode extends DefaultMutableTreeNode
 		}
 	}
 
+	public NLPTreeNode(String name) {
+		super(name);
+	}
+
 	public String getTreeString() {
 		return getTreeStringImpl(new StringBuffer()).toString();
 	}

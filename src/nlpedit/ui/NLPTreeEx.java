@@ -119,8 +119,7 @@ public class NLPTreeEx extends JFrame {
 
 		leftPanel.add(sentArea);
 
-		JScrollPane treeScroll = new JScrollPane(tree);
-		leftPanel.add(treeScroll);
+		leftPanel.add(tree);
 
 		leftPanel.add(treeArea);
 

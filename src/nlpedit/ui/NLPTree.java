@@ -19,8 +19,11 @@
 
 package nlpedit.ui;
 
+import java.awt.GridLayout;
 import javax.swing.Icon;
 import javax.swing.JTree;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeCellEditor;
@@ -36,20 +39,39 @@ import edu.stanford.nlp.trees.LabeledScoredTreeFactory;
 import edu.stanford.nlp.trees.LabeledScoredTreeNode;
 import edu.stanford.nlp.ling.StringLabelFactory;
 
-public class NLPTree extends JTree {
+public class NLPTree extends JPanel {
+	protected NLPTreeNode rootNode;
+	protected DefaultTreeModel treeModel;
+	protected JTree tree;
+
 	public NLPTree(Tree root) {
-		super(new DefaultTreeModel(new NLPTreeNode(root)));
-		getSelectionModel().setSelectionMode(
-			TreeSelectionModel.SINGLE_TREE_SELECTION);
-		setEditable(true);
+		super(new GridLayout(1, 0));
+		init(root);
 	}
 
 	public NLPTree(){
-		setEditable(true);
+		super(new GridLayout(1, 0));
+		init(null);
+	}
+
+	public void init(Tree root) {
+		if (root == null) {
+			rootNode = new NLPTreeNode("ROOT");
+		} else {
+			rootNode = new NLPTreeNode(root);
+		}
+		treeModel = new DefaultTreeModel(rootNode);
+		tree = new JTree(treeModel);
+		tree.setEditable(true);
+		tree.getSelectionModel().setSelectionMode(
+			TreeSelectionModel.SINGLE_TREE_SELECTION);
+		JScrollPane scrollPane = new JScrollPane(tree);
+		add(scrollPane);
 	}
 
 	public void setTree(Tree root) {
-		setModel(new DefaultTreeModel(new NLPTreeNode(root)));
+		treeModel = new DefaultTreeModel(new NLPTreeNode(root));
+		tree.setModel(treeModel);
 	}
 
 	public String getTreeString() {
@@ -58,13 +80,13 @@ public class NLPTree extends JTree {
 	}
 
 	public Tree getTree() {
-		Tree tree = new LabeledScoredTreeNode();
+		Tree ntree = new LabeledScoredTreeNode();
 		try {
-		tree = (new PennTreeReader(new StringReader(getTreeString()), new LabeledScoredTreeFactory(new StringLabelFactory()))).readTree();
+		ntree = (new PennTreeReader(new StringReader(getTreeString()), new LabeledScoredTreeFactory(new StringLabelFactory()))).readTree();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return tree;
+		return ntree;
 	}
 }
 
