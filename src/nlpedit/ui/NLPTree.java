@@ -88,5 +88,43 @@ public class NLPTree extends JPanel {
 		}
 		return ntree;
 	}
+
+	public void removeCurrentNode() {
+		TreePath currentSelection = tree.getSelectionPath();
+		if (currentSelection != null) {
+			NLPTreeNode currentNode = (NLPTreeNode)(currentSelection.getLastPathComponent());
+			NLPTreeNode parent = (NLPTreeNode)(currentNode.getParent());
+
+			if (parent != null) {
+				treeModel.removeNodeFromParent(currentNode);
+			}
+		}
+	}
+
+	public void addObject(String child) {
+		NLPTreeNode parentNode = null;
+		TreePath parentPath = tree.getSelectionPath();
+
+		if (parentPath == null) {
+			parentNode = rootNode;
+		} else {
+			parentNode = (NLPTreeNode)(parentPath.getLastPathComponent());
+		}
+		addObject(parentNode, child, true);
+	}
+
+	public void addObject(NLPTreeNode parent, String child, boolean shouldBeVisible) {
+		NLPTreeNode childNode = new NLPTreeNode(child);
+
+		if (parent == null) {
+			parent = rootNode;
+		}
+
+		treeModel.insertNodeInto(childNode, parent, parent.getChildCount());
+
+		if (shouldBeVisible) {
+			tree.scrollPathToVisible(new TreePath(childNode.getPath()));
+		}
+	}
 }
 

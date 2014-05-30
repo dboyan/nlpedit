@@ -36,7 +36,7 @@ import edu.stanford.nlp.parser.lexparser.LexicalizedParserQuery;
 import edu.stanford.nlp.parser.ui.TreeJPanel;
 
 public class NLPTreeEx extends JFrame {
-	private NLPTree tree;
+	private NLPTreeEdit treeEdit;
 	private JButton parseButton;
 	private JButton updateTextButton;
 	private JButton updateGraphButton;
@@ -64,15 +64,15 @@ public class NLPTreeEx extends JFrame {
 		List<CoreLabel> rawWords = tokenizerFactory.getTokenizer(new StringReader(sent)).tokenize();
 		lpq.parse(rawWords);
 		Tree parse = lpq.getBestParse();
-		tree.setTree(parse);
+		treeEdit.setTree(parse);
 	}
 
 	private void updateText() {
-		treeArea.setText(tree.getTreeString());
+		treeArea.setText(treeEdit.getTreeString());
 	}
 
 	private void updateGraph() {
-		treeGraph.setTree(tree.getTree());
+		treeGraph.setTree(treeEdit.getTree());
 	}
 
 	private void initComponents() {
@@ -80,7 +80,7 @@ public class NLPTreeEx extends JFrame {
 		parseButton = new JButton("parse");
 		updateTextButton = new JButton("update text");
 		updateGraphButton = new JButton("update graph");
-		tree = new NLPTree();
+		treeEdit = new NLPTreeEdit();
 		sentArea = new JTextArea(5, 40);
 		treeArea = new JTextArea(5, 40);
 		treeGraph = new TreeJPanel();
@@ -119,7 +119,7 @@ public class NLPTreeEx extends JFrame {
 
 		leftPanel.add(sentArea);
 
-		leftPanel.add(tree);
+		leftPanel.add(treeEdit);
 
 		leftPanel.add(treeArea);
 
