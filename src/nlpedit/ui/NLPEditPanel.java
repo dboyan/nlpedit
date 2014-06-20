@@ -19,7 +19,36 @@
 
 package nlpedit.ui;
 
+import nlpedit.core.NLPProject;
+import java.io.File;
+import java.awt.Dimension;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
+import javax.swing.JScrollPane;
 
 public class NLPEditPanel extends JPanel {
+	private NLPProject project;
+	private JTextPane textPane;
+
+	public NLPEditPanel() {
+		buildGUI();
+
+		project = null;
+	}
+
+	private void buildGUI() {
+		textPane = new JTextPane();
+
+		textPane.setEditable(false);
+		textScrollPane = new JScrollPane(textPane);
+		textScrollPane.setPreferredSize(new Dimension(250, 250));
+		add(textScrollPane);
+	}
+
+	public void importText(File fileName) {
+		project = new NLPProject(fileName);
+		textPane.setText(project.getDocument());
+	}
+
+	private JScrollPane textScrollPane;
 }

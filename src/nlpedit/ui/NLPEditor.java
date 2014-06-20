@@ -21,6 +21,7 @@ package nlpedit.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -31,10 +32,12 @@ import javax.swing.JSeparator;
 
 public class NLPEditor extends JFrame {
 	private NLPEditPanel mainPanel;
+	private JFileChooser jfc;
 
 	public NLPEditor() {
 		buildGUI();
 
+		jfc = new JFileChooser();
 		mainPanel = new NLPEditPanel();
 		getContentPane().add("Center", mainPanel);
 		pack();
@@ -94,6 +97,10 @@ public class NLPEditor extends JFrame {
 	}
 
 	protected void importTextActionPerformed(ActionEvent e) {
+		int retval = jfc.showOpenDialog(this);
+		if (retval == JFileChooser.APPROVE_OPTION) {
+			mainPanel.importText(jfc.getSelectedFile());
+		}
 	}
 
 	protected void saveProjectActionPerformed(ActionEvent e) {
