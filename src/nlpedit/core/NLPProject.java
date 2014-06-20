@@ -26,6 +26,8 @@ import java.io.FileReader;
 import java.io.Serializable;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.Vector;
+import java.util.Map;
 
 import edu.stanford.nlp.ling.*;
 import edu.stanford.nlp.process.DocumentPreprocessor;
@@ -33,6 +35,7 @@ import edu.stanford.nlp.process.DocumentPreprocessor;
 public class NLPProject implements Serializable {
 	private String document;
 	private TreeMap<Integer, Integer> boundaryMap;
+	private Vector<Integer> boundaryArray;
 	private int numSentence;
 
 	public NLPProject(String str) {
@@ -53,25 +56,49 @@ public class NLPProject implements Serializable {
 		return document;
 	}
 
+	public int getSentenceCount() {
+		return numSentence;
+	}
+
+	public NLPSentenceInfo getInfoFromPos(int pos) {
+		int sentID, begin, end;
+		Map.Entry<Integer, Integer> entry;
+
+		entry = boundaryMap.lowerEntry(pos);
+		if (entry.getValue() == numSentence) {
+			sentID = entry.getValue() - 1;
+		} else {
+			sentID = entry.getValue();
+		}
+
+		begin = boundaryArray.elementAt(sentID);
+		end = boundaryArray.elementAt(sentID + 1) - 1;
+		return new NLPSentenceInfo(begin, end, sentID);
+	}
+
 	private void setupBoundaries() {
 		StringReader reader = new StringReader(document);
 		DocumentPreprocessor processor = new DocumentPreprocessor(reader);
 		int sentCount = 0;
 
 		boundaryMap = new TreeMap<Integer, Integer>();
+		boundaryArray = new Vector<Integer>();
 
 		for (List<HasWord> sentence : processor) {
 			if (sentence.size() == 0)
 				continue;
 			if (sentCount == 0) {
 				boundaryMap.put(0, 0);
+				boundaryArray.add(0);
 			} else {
 				HasOffset first = (HasOffset) sentence.get(0);
 				boundaryMap.put(first.beginPosition(), sentCount);
+				boundaryArray.add(first.beginPosition());
 			}
 			sentCount++;
 		}
 		boundaryMap.put(document.length(), sentCount);
+		boundaryArray.add(document.length());
 		numSentence = sentCount;
 	}
 
