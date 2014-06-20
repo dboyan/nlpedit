@@ -30,12 +30,12 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
 public class NLPEditor extends JFrame {
-	private JPanel mainPanel;
+	private NLPEditPanel mainPanel;
 
 	public NLPEditor() {
 		buildGUI();
 
-		mainPanel = new JPanel();
+		mainPanel = new NLPEditPanel();
 		getContentPane().add("Center", mainPanel);
 		pack();
 
