@@ -20,12 +20,20 @@
 package nlpedit.core;
 
 import java.io.BufferedReader;
+import java.io.StringReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.Serializable;
+import java.util.List;
+import java.util.TreeMap;
+
+import edu.stanford.nlp.ling.*;
+import edu.stanford.nlp.process.DocumentPreprocessor;
 
 public class NLPProject implements Serializable {
 	private String document;
+	private TreeMap<Integer, Integer> boundaryMap;
+	private int numSentence;
 
 	public NLPProject(String str) {
 		document = str;
@@ -38,13 +46,36 @@ public class NLPProject implements Serializable {
 	}
 
 	private void initialize() {
+		setupBoundaries();
 	}
 
 	public String getDocument() {
 		return document;
 	}
 
-	private String getFileContent(File fileName) {
+	private void setupBoundaries() {
+		StringReader reader = new StringReader(document);
+		DocumentPreprocessor processor = new DocumentPreprocessor(reader);
+		int sentCount = 0;
+
+		boundaryMap = new TreeMap<Integer, Integer>();
+
+		for (List<HasWord> sentence : processor) {
+			if (sentence.size() == 0)
+				continue;
+			if (sentCount == 0) {
+				boundaryMap.put(0, 0);
+			} else {
+				HasOffset first = (HasOffset) sentence.get(0);
+				boundaryMap.put(first.beginPosition(), sentCount);
+			}
+			sentCount++;
+		}
+		boundaryMap.put(document.length(), sentCount);
+		numSentence = sentCount;
+	}
+
+	private static String getFileContent(File fileName) {
 		StringBuffer buf = new StringBuffer();
 		try {
 			BufferedReader reader = new BufferedReader(
