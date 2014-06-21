@@ -108,22 +108,7 @@ public class NLPProject implements Serializable {
 		numSentence = sentCount;
 	}
 
-	private static String getFileContent(File fileName) {
-		StringBuffer buf = new StringBuffer();
-		try {
-			BufferedReader reader = new BufferedReader(
-				new FileReader(fileName));
-			String line = reader.readLine();
-			while (line != null) {
-				buf.append(line);
-				buf.append("\n");
-				line = reader.readLine();
-			}
-			reader.close();
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-		return buf.toString();
 	}
 }
 

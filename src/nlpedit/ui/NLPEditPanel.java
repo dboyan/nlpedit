@@ -21,6 +21,7 @@ package nlpedit.ui;
 
 import nlpedit.core.NLPProject;
 import nlpedit.core.NLPSentenceInfo;
+import nlpedit.util.FileContentGetter;
 
 import java.io.File;
 import java.awt.Color;
@@ -120,7 +121,9 @@ public class NLPEditPanel extends JPanel {
 	}
 
 	public void importText(File fileName) {
-		project = new NLPProject(fileName);
+		String doc = FileContentGetter.getFileContent(fileName);
+
+		project = new NLPProject(doc);
 		textPane.setText(project.getDocument());
 		if (project.getSentenceCount() > 0) {
 			scrollToSentence(0);
