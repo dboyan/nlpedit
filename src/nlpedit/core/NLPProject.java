@@ -22,20 +22,27 @@ package nlpedit.core;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Map;
 
+import nlpedit.ui.NLPTreeNode;
+
 import edu.stanford.nlp.ling.*;
 import edu.stanford.nlp.process.DocumentPreprocessor;
 
-public class NLPProject implements Serializable {
+public class NLPProject {
 	private String document;
 	private TreeMap<Integer, Integer> boundaryMap;
 	private Vector<Integer> boundaryArray;
+	private Vector<NLPTreeNode> treeArray;
 	private int numSentence;
 
 	public NLPProject(String str) {
@@ -43,9 +50,27 @@ public class NLPProject implements Serializable {
 		initialize();
 	}
 
-	public NLPProject(File fileName) {
-		document = getFileContent(fileName);
-		initialize();
+	public NLPProject(File file) {
+		FileInputStream fis;
+		ObjectInputStream ois;
+		NLPProjectSerializedForm sForm;
+
+		try {
+			fis = new FileInputStream(file);
+			ois = new ObjectInputStream(fis);
+			sForm = (NLPProjectSerializedForm)
+				ois.readObject();
+			ois.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			sForm = null;
+		}
+
+		document = sForm.document;
+		boundaryArray = sForm.boundaryArray;
+		boundaryMap = sForm.boundaryMap;
+		treeArray = sForm.treeArray;
+		numSentence = treeArray.size() - 1;
 	}
 
 	private void initialize() {
@@ -58,6 +83,20 @@ public class NLPProject implements Serializable {
 
 	public int getSentenceCount() {
 		return numSentence;
+	}
+
+	public void saveToFile(File file) {
+		try {
+		FileOutputStream fos = new FileOutputStream(file);
+		ObjectOutputStream oos = new ObjectOutputStream(fos);
+		NLPProjectSerializedForm sForm = new NLPProjectSerializedForm(
+				document, boundaryMap, boundaryArray,
+				treeArray);
+		oos.writeObject(sForm);
+		oos.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public NLPSentenceInfo getInfoFromPos(int pos) {
@@ -108,6 +147,20 @@ public class NLPProject implements Serializable {
 		numSentence = sentCount;
 	}
 
+	class NLPProjectSerializedForm implements Serializable {
+		String document;
+		TreeMap<Integer, Integer> boundaryMap;
+		Vector<Integer> boundaryArray;
+		Vector<NLPTreeNode> treeArray;
+
+		public NLPProjectSerializedForm(String d,
+				TreeMap<Integer, Integer> bm,
+				Vector<Integer> ba,
+				Vector<NLPTreeNode> ta) {
+			document = d;
+			boundaryMap = bm;
+			boundaryArray = ba;
+			treeArray = ta;
 		}
 	}
 }
