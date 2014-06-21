@@ -76,6 +76,12 @@ public class NLPProject implements Serializable {
 		return new NLPSentenceInfo(begin, end, sentID);
 	}
 
+	public NLPSentenceInfo getInfoFromID(int ID) {
+		return new NLPSentenceInfo(boundaryArray.elementAt(ID),
+					   boundaryArray.elementAt(ID + 1) - 1,
+					   ID);
+	}
+
 	private void setupBoundaries() {
 		StringReader reader = new StringReader(document);
 		DocumentPreprocessor processor = new DocumentPreprocessor(reader);
