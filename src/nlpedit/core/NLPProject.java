@@ -89,8 +89,8 @@ public class NLPProject {
 	}
 
 	public void parseAll() {
-		NLPParseAllWorker worker = new NLPParseAllWorker();
-		worker.run();
+		Thread worker = new Thread(new NLPParseAllWorker());
+		worker.start();
 	}
 
 	public String getDocument() {
