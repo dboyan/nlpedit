@@ -122,13 +122,9 @@ public class NLPEditPanel extends JPanel {
 	public void importText(File fileName) {
 		project = new NLPProject(fileName);
 		textPane.setText(project.getDocument());
-		currentPos = 0;
-		currentSentence = 0;
-		textPane.setCaretPosition(0);
 		if (project.getSentenceCount() > 0) {
-			highlightSentenceID(0);
+			scrollToSentence(0);
 		}
-		refreshNavigator();
 	}
 
 	private void highlightSentencePos(int pos) {
@@ -190,10 +186,7 @@ public class NLPEditPanel extends JPanel {
 		int pos = textPane.getCaretPosition();
 		NLPSentenceInfo info = project.getInfoFromPos(pos);
 
-		currentSentence = info.getSentenceID();
-		currentPos = pos;
-		highlightSentencePos(pos);
-		refreshNavigator();
+		scrollToSentence(info.getSentenceID());
 	}
 
 	private JScrollPane textScrollPane;
