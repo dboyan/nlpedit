@@ -34,6 +34,7 @@ import java.util.Vector;
 import java.util.Map;
 
 import nlpedit.ui.NLPTreeNode;
+import nlpedit.event.*;
 
 import edu.stanford.nlp.ling.*;
 import edu.stanford.nlp.process.DocumentPreprocessor;
@@ -46,6 +47,8 @@ public class NLPProject {
 	private TreeMap<Integer, Integer> boundaryMap;
 	private Vector<Integer> boundaryArray;
 	private Vector<NLPTreeNode> treeArray;
+	private Vector<ParseStatusListener> statusListeners;
+	private Vector<ParseFinishListener> finishListeners;
 	private int numSentence;
 
 	private LexicalizedParserQuery lpq;
@@ -81,6 +84,8 @@ public class NLPProject {
 
 	private void initialize() {
 		setupBoundaries();
+		statusListeners = new Vector<ParseStatusListener>();
+		finishListeners = new Vector<ParseFinishListener>();
 	}
 
 	public void setupParser(LexicalizedParserQuery l, TokenizerFactory<CoreLabel> tf) {
@@ -105,15 +110,31 @@ public class NLPProject {
 		return treeArray.elementAt(id);
 	}
 
+	public void addStatusListener(ParseStatusListener sl) {
+		statusListeners.add(sl);
+	}
+
+	public void removeStatusListener(ParseStatusListener sl) {
+		statusListeners.remove(sl);
+	}
+
+	public void addFinishListener(ParseFinishListener fl) {
+		finishListeners.add(fl);
+	}
+
+	public void removeStatusListener(ParseFinishListener fl) {
+		finishListeners.remove(fl);
+	}
+
 	public void saveToFile(File file) {
 		try {
-		FileOutputStream fos = new FileOutputStream(file);
-		ObjectOutputStream oos = new ObjectOutputStream(fos);
-		NLPProjectSerializedForm sForm = new NLPProjectSerializedForm(
-				document, boundaryMap, boundaryArray,
-				treeArray);
-		oos.writeObject(sForm);
-		oos.close();
+			FileOutputStream fos = new FileOutputStream(file);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			NLPProjectSerializedForm sForm = new NLPProjectSerializedForm(
+					document, boundaryMap, boundaryArray,
+					treeArray);
+			oos.writeObject(sForm);
+			oos.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -204,6 +225,12 @@ public class NLPProject {
 			treeArray.clear();
 			for (int i = 0; i < numSentence; i++) {
 				treeArray.add(parseSentenceID(i));
+				for (ParseStatusListener listener: statusListeners) {
+					listener.parseStatusEmitted(new ParseStatusEvent(i + 1, NLPProject.this));
+				}
+			}
+			for (ParseFinishListener listener : finishListeners) {
+				listener.parseFinished(new ParseFinishEvent(NLPProject.this));
 			}
 		}
 	}
