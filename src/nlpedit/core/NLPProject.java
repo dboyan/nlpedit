@@ -87,13 +87,13 @@ public class NLPProject {
 
 	public void saveToFile(File file) {
 		try {
-		FileOutputStream fos = new FileOutputStream(file);
-		ObjectOutputStream oos = new ObjectOutputStream(fos);
-		NLPProjectSerializedForm sForm = new NLPProjectSerializedForm(
-				document, boundaryMap, boundaryArray,
-				treeArray);
-		oos.writeObject(sForm);
-		oos.close();
+			FileOutputStream fos = new FileOutputStream(file);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			NLPProjectSerializedForm sForm = new NLPProjectSerializedForm(
+					document, boundaryMap, boundaryArray,
+					treeArray);
+			oos.writeObject(sForm);
+			oos.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
