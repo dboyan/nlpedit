@@ -41,12 +41,23 @@ import javax.swing.JButton;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.objectbank.TokenizerFactory;
+import edu.stanford.nlp.process.CoreLabelTokenFactory;
+import edu.stanford.nlp.process.PTBTokenizer;
+import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
+import edu.stanford.nlp.parser.lexparser.LexicalizedParserQuery;
+
 public class NLPEditPanel extends JPanel {
 	private NLPProject project;
 	private JTextPane textPane;
 	private JPanel editPanel; // TODO
 	private JLabel statusLabel;
 	private SimpleAttributeSet normalStyle, highlightStyle;
+
+	private LexicalizedParser lp;
+	private LexicalizedParserQuery lpq;
+	private TokenizerFactory<CoreLabel> tokenizerFactory;
 
 	private int currentPos, currentSentence;
 
@@ -57,6 +68,10 @@ public class NLPEditPanel extends JPanel {
 		normalStyle = new SimpleAttributeSet();
 		StyleConstants.setBackground(highlightStyle, Color.yellow);
 		StyleConstants.setBackground(normalStyle, textPane.getBackground());
+
+		lp = LexicalizedParser.loadModel("englishPCFG.ser.gz");
+		lpq = lp.parserQuery();
+		tokenizerFactory = PTBTokenizer.factory(new CoreLabelTokenFactory(), "");
 
 		project = null;
 	}

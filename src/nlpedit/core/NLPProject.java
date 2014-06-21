@@ -37,6 +37,9 @@ import nlpedit.ui.NLPTreeNode;
 
 import edu.stanford.nlp.ling.*;
 import edu.stanford.nlp.process.DocumentPreprocessor;
+import edu.stanford.nlp.objectbank.TokenizerFactory;
+import edu.stanford.nlp.trees.*;
+import edu.stanford.nlp.parser.lexparser.LexicalizedParserQuery;
 
 public class NLPProject {
 	private String document;
@@ -44,6 +47,9 @@ public class NLPProject {
 	private Vector<Integer> boundaryArray;
 	private Vector<NLPTreeNode> treeArray;
 	private int numSentence;
+
+	private LexicalizedParserQuery lpq;
+	private TokenizerFactory<CoreLabel> tokenizerFactory;
 
 	public NLPProject(String str) {
 		document = str;
@@ -77,12 +83,26 @@ public class NLPProject {
 		setupBoundaries();
 	}
 
+	public void setupParser(LexicalizedParserQuery l, TokenizerFactory<CoreLabel> tf) {
+		lpq = l;
+		tokenizerFactory = tf;
+	}
+
+	public void parseAll() {
+		NLPParseAllWorker worker = new NLPParseAllWorker();
+		worker.run();
+	}
+
 	public String getDocument() {
 		return document;
 	}
 
 	public int getSentenceCount() {
 		return numSentence;
+	}
+
+	public NLPTreeNode getTree(int id) {
+		return treeArray.elementAt(id);
 	}
 
 	public void saveToFile(File file) {
@@ -147,6 +167,21 @@ public class NLPProject {
 		numSentence = sentCount;
 	}
 
+	private NLPTreeNode parseSentence(String s) {
+		if (s.trim().equals("")) {
+			return new NLPTreeNode("ROOT");
+		}
+		List<CoreLabel> rawWords = tokenizerFactory.getTokenizer(new StringReader(s)).tokenize();
+		lpq.parse(rawWords);
+		return new NLPTreeNode(lpq.getBestParse());
+	}
+
+	private NLPTreeNode parseSentenceID(int num) {
+		int start = boundaryArray.elementAt(num);
+		int end = boundaryArray.elementAt(num + 1);
+		return parseSentence(document.substring(start, end));
+	}
+
 	class NLPProjectSerializedForm implements Serializable {
 		String document;
 		TreeMap<Integer, Integer> boundaryMap;
@@ -161,6 +196,15 @@ public class NLPProject {
 			boundaryMap = bm;
 			boundaryArray = ba;
 			treeArray = ta;
+		}
+	}
+
+	class NLPParseAllWorker implements Runnable {
+		public void run() {
+			treeArray.clear();
+			for (int i = 0; i < numSentence; i++) {
+				treeArray.add(parseSentenceID(i));
+			}
 		}
 	}
 }
