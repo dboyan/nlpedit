@@ -60,9 +60,17 @@ public class TreeJPanel extends JPanel {
 		}
 	}
 
+	public void change(int x, int y, String str)
+	{
+		NLPTreeNode target = tree.find(x, y);
+		target.setValue(str);
+	}
 
 	protected NLPTreeNode tree;
 	public SentenceParser sentParser = new SentenceParser();
+	public static String savedStr;
+	public static int savedX, savedY;
+	public static int curX, curY;
 	
 	public NLPTreeNode getTree() {
 		return tree;
@@ -172,6 +180,20 @@ public class TreeJPanel extends JPanel {
 		double childTab = wr.childTab;
 		double nodeCenter = wr.nodeCenter;
 		//double treeHeight = height(t, fM);
+		
+		t.x = (int)(nodeTab + start.getX());
+		t.y = (int)(start.getY() + nodeAscent - nodeHeight / 4 * 3);
+		t.width = (int)nodeWidth;
+		t.height = (int)(nodeHeight);
+
+		// highlight the choosen part
+		if (t.isInside(curX, curY))
+		{
+			g2.setColor(Color.yellow);
+			g2.fillRect(t.x, t.y, t.width, t.height);
+			g2.setColor(Color.black);
+		}
+
 		// draw root
 		g2.drawString(nodeStr, (float) (nodeTab + start.getX()), (float) (start.getY() + nodeAscent));
 		

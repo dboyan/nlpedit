@@ -142,7 +142,21 @@ public class NLPEditPanel extends JPanel
 			}
 		});
 
-		//editPanel
+		//editPanel.setPreferredSize(new Dimension(400, 300));
+		editPanel.addMouseMotionListener(new MouseAdapter()
+		{
+			public void mouseMoved(MouseEvent e)
+			{
+				editPanelMouseMoved(e);
+			}
+		});
+		editPanel.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent e)
+			{
+				editPanelMouseClicked(e);
+			}
+		});
 
 		textScrollPane.setViewportView(textPane);
 		topPanel.add(textScrollPane, BorderLayout.CENTER);
@@ -283,6 +297,31 @@ public class NLPEditPanel extends JPanel
 		NLPSentenceInfo info = project.getInfoFromPos(pos);
 
 		scrollToSentence(info.getSentenceID());
+	}
+
+	private void editPanelMouseMoved(MouseEvent e)
+	{
+		if (project == null || project.getSentenceCount() == 0)
+			return ;
+
+		editPanel.curX = e.getX();
+		editPanel.curY = e.getY();
+
+		editPanel.repaint();
+
+		//JOptionPane.showMessageDialog(null, editPanel.curX + " " + editPanel.curY, "bsbs", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	private void editPanelMouseClicked(MouseEvent e)
+	{
+		if (project == null || project.getSentenceCount() == 0)
+			return ;
+
+		String str = JOptionPane.showInputDialog(null, "Attribute Change", "");
+		editPanel.change(e.getX(), e.getY(), str);
+		repaint();
+
+		//JOptionPane.showMessageDialog(null, e.getX() + " " + e.getY() + " " + editPanel.curX + " " + editPanel.curY, "sbsb", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	public void parseStatusEmitted(ParseStatusEvent e) {

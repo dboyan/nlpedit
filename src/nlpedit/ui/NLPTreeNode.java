@@ -31,6 +31,28 @@ public class NLPTreeNode extends DefaultMutableTreeNode implements Serializable
 			return "fuck you";
 	}
 
+	public void setValue(String str)
+	{
+		userObject = str;
+	}
+
+	boolean isInside(int a, int b)
+	{
+		return a >= x && a < x + width && b >= y && b < y + height;
+	}
+
+	public NLPTreeNode find(int x, int y)
+	{
+		NLPTreeNode ret;
+		if (isInside(x, y))
+			return this;
+		else
+			for (int i = 0; i < getChildCount(); ++i)
+				if ((ret = getChildAt(i).find(x, y)) != null)
+					return ret;
+		return null;
+	}
+
 	@Override
 	public NLPTreeNode getChildAt(int i)
 	{
