@@ -25,7 +25,10 @@ public class NLPTreeNode extends DefaultMutableTreeNode implements Serializable
 
 	public String value()
 	{
-		return (String)userObject;
+		if (userObject != null)
+			return (String)userObject;
+		else
+			return "fuck you";
 	}
 
 	@Override

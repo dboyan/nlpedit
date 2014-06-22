@@ -77,6 +77,7 @@ public class TreeJPanel extends JPanel {
 	{
 		if (sent == "")
 			return ; 
+		JOptionPane.showMessageDialog(null, sent, "hehe", JOptionPane.INFORMATION_MESSAGE);
 		setTree(sentParser.parse(sent));
 	}
 
@@ -156,9 +157,6 @@ public class TreeJPanel extends JPanel {
 
 	private static double paintTree(NLPTreeNode t, Point2D start, Graphics2D g2, FontMetrics fM) {
 		
-		JOptionPane.showMessageDialog(null, "fuck", "haha", JOptionPane.INFORMATION_MESSAGE);
-	
-
 		if (t == null) {
 			return 0.0;
 		}
