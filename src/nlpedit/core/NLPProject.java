@@ -34,16 +34,25 @@ import java.util.Vector;
 import java.util.Map;
 
 import nlpedit.ui.NLPTreeNode;
+import nlpedit.event.*;
 
 import edu.stanford.nlp.ling.*;
 import edu.stanford.nlp.process.DocumentPreprocessor;
+import edu.stanford.nlp.objectbank.TokenizerFactory;
+import edu.stanford.nlp.trees.*;
+import edu.stanford.nlp.parser.lexparser.LexicalizedParserQuery;
 
 public class NLPProject {
 	private String document;
 	private TreeMap<Integer, Integer> boundaryMap;
 	private Vector<Integer> boundaryArray;
 	private Vector<NLPTreeNode> treeArray;
+	private Vector<ParseStatusListener> statusListeners;
+	private Vector<ParseFinishListener> finishListeners;
 	private int numSentence;
+
+	private LexicalizedParserQuery lpq;
+	private TokenizerFactory<CoreLabel> tokenizerFactory;
 
 	public NLPProject(String str) {
 		document = str;
@@ -75,6 +84,19 @@ public class NLPProject {
 
 	private void initialize() {
 		setupBoundaries();
+		treeArray = new Vector<NLPTreeNode>();
+		statusListeners = new Vector<ParseStatusListener>();
+		finishListeners = new Vector<ParseFinishListener>();
+	}
+
+	public void setupParser(LexicalizedParserQuery l, TokenizerFactory<CoreLabel> tf) {
+		lpq = l;
+		tokenizerFactory = tf;
+	}
+
+	public void parseAll() {
+		Thread worker = new Thread(new NLPParseAllWorker());
+		worker.start();
 	}
 
 	public String getDocument() {
@@ -83,6 +105,26 @@ public class NLPProject {
 
 	public int getSentenceCount() {
 		return numSentence;
+	}
+
+	public NLPTreeNode getTree(int id) {
+		return treeArray.elementAt(id);
+	}
+
+	public void addStatusListener(ParseStatusListener sl) {
+		statusListeners.add(sl);
+	}
+
+	public void removeStatusListener(ParseStatusListener sl) {
+		statusListeners.remove(sl);
+	}
+
+	public void addFinishListener(ParseFinishListener fl) {
+		finishListeners.add(fl);
+	}
+
+	public void removeStatusListener(ParseFinishListener fl) {
+		finishListeners.remove(fl);
 	}
 
 	public void saveToFile(File file) {
@@ -147,6 +189,21 @@ public class NLPProject {
 		numSentence = sentCount;
 	}
 
+	private NLPTreeNode parseSentence(String s) {
+		if (s.trim().equals("")) {
+			return new NLPTreeNode("ROOT");
+		}
+		List<CoreLabel> rawWords = tokenizerFactory.getTokenizer(new StringReader(s)).tokenize();
+		lpq.parse(rawWords);
+		return new NLPTreeNode(lpq.getBestParse());
+	}
+
+	private NLPTreeNode parseSentenceID(int num) {
+		int start = boundaryArray.elementAt(num);
+		int end = boundaryArray.elementAt(num + 1);
+		return parseSentence(document.substring(start, end));
+	}
+
 	class NLPProjectSerializedForm implements Serializable {
 		String document;
 		TreeMap<Integer, Integer> boundaryMap;
@@ -161,6 +218,21 @@ public class NLPProject {
 			boundaryMap = bm;
 			boundaryArray = ba;
 			treeArray = ta;
+		}
+	}
+
+	class NLPParseAllWorker implements Runnable {
+		public void run() {
+			treeArray.clear();
+			for (int i = 0; i < numSentence; i++) {
+				treeArray.add(parseSentenceID(i));
+				for (ParseStatusListener listener: statusListeners) {
+					listener.parseStatusEmitted(new ParseStatusEvent(i + 1, NLPProject.this));
+				}
+			}
+			for (ParseFinishListener listener : finishListeners) {
+				listener.parseFinished(new ParseFinishEvent(NLPProject.this));
+			}
 		}
 	}
 }

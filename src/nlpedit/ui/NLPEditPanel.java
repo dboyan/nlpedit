@@ -21,6 +21,7 @@ package nlpedit.ui;
 
 import nlpedit.core.NLPProject;
 import nlpedit.core.NLPSentenceInfo;
+import nlpedit.event.*;
 import nlpedit.util.FileContentGetter;
 
 import java.io.File;
@@ -38,15 +39,30 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JLabel;
 import javax.swing.JButton;
+import javax.swing.JProgressBar;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
-public class NLPEditPanel extends JPanel {
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.objectbank.TokenizerFactory;
+import edu.stanford.nlp.process.CoreLabelTokenFactory;
+import edu.stanford.nlp.process.PTBTokenizer;
+import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
+import edu.stanford.nlp.parser.lexparser.LexicalizedParserQuery;
+
+public class NLPEditPanel extends JPanel
+			  implements ParseStatusListener, 
+	   			     ParseFinishListener {
 	private NLPProject project;
 	private JTextPane textPane;
 	private JPanel editPanel; // TODO
 	private JLabel statusLabel;
+	private JProgressBar progressBar;
 	private SimpleAttributeSet normalStyle, highlightStyle;
+
+	private LexicalizedParser lp;
+	private LexicalizedParserQuery lpq;
+	private TokenizerFactory<CoreLabel> tokenizerFactory;
 
 	private int currentPos, currentSentence;
 
@@ -57,6 +73,10 @@ public class NLPEditPanel extends JPanel {
 		normalStyle = new SimpleAttributeSet();
 		StyleConstants.setBackground(highlightStyle, Color.yellow);
 		StyleConstants.setBackground(normalStyle, textPane.getBackground());
+
+		lp = LexicalizedParser.loadModel("englishPCFG.ser.gz");
+		lpq = lp.parserQuery();
+		tokenizerFactory = PTBTokenizer.factory(new CoreLabelTokenFactory(), "");
 
 		project = null;
 	}
@@ -116,6 +136,10 @@ public class NLPEditPanel extends JPanel {
 		statusPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		statusLabel.setText("Ready");
 		statusPanel.add(statusLabel);
+		progressBar = new JProgressBar();
+		progressBar.setMinimum(0);
+		progressBar.setVisible(false);
+		statusPanel.add(progressBar);
 
 		add(statusPanel, BorderLayout.SOUTH);
 	}
@@ -124,7 +148,17 @@ public class NLPEditPanel extends JPanel {
 		String doc = FileContentGetter.getFileContent(fileName);
 
 		project = new NLPProject(doc);
+		project.setupParser(lpq, tokenizerFactory);
+		project.addStatusListener(this);
+		project.addFinishListener(this);
 		textPane.setText(project.getDocument());
+
+		progressBar.setMaximum(project.getSentenceCount());
+		progressBar.setValue(0);
+		statusLabel.setText("Parsing (0 of " + project.getSentenceCount() + ")");
+		progressBar.setVisible(true);
+
+		project.parseAll();
 		if (project.getSentenceCount() > 0) {
 			scrollToSentence(0);
 		}
@@ -190,6 +224,19 @@ public class NLPEditPanel extends JPanel {
 		NLPSentenceInfo info = project.getInfoFromPos(pos);
 
 		scrollToSentence(info.getSentenceID());
+	}
+
+	public void parseStatusEmitted(ParseStatusEvent e) {
+		int count = e.getCount();
+
+		progressBar.setValue(count);
+		statusLabel.setText("Parsing (" + count + " of " +
+			project.getSentenceCount() + ")");
+	}
+
+	public void parseFinished(ParseFinishEvent e) {
+		progressBar.setVisible(false);
+		statusLabel.setText("Ready");
 	}
 
 	private JScrollPane textScrollPane;
