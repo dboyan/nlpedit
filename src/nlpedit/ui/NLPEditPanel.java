@@ -55,7 +55,7 @@ public class NLPEditPanel extends JPanel
 	   			     ParseFinishListener {
 	private NLPProject project;
 	private JTextPane textPane;
-	private JPanel editPanel; // TODO
+	private TreeJPanel editPanel; // TODO
 	private JLabel statusLabel;
 	private JProgressBar progressBar;
 	private SimpleAttributeSet normalStyle, highlightStyle;
@@ -89,7 +89,7 @@ public class NLPEditPanel extends JPanel
 		nextButton = new JButton();
 		textPane = new JTextPane();
 		textScrollPane = new JScrollPane();
-		editPanel = new JPanel(); // TODO
+		editPanel = new TreeJPanel(); // TODO
 		statusPanel = new JPanel();
 		statusLabel = new JLabel();
 
