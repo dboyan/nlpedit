@@ -44,6 +44,8 @@ public class NLPTreeNode extends DefaultMutableTreeNode implements Serializable
 	public NLPTreeNode find(int x, int y)
 	{
 		NLPTreeNode ret;
+		if (isLeaf())
+			return null;
 		if (isInside(x, y))
 			return this;
 		else

@@ -60,16 +60,28 @@ public class TreeJPanel extends JPanel {
 		}
 	}
 
-	public void change(int x, int y, String str)
+	public void changeStr(int x, int y, String str)
 	{
+		//JOptionPane.showMessageDialog(null, str, "haha0.5", JOptionPane.INFORMATION_MESSAGE);
 		NLPTreeNode target = tree.find(x, y);
+		//JOptionPane.showMessageDialog(null, target.value(), "haha", JOptionPane.INFORMATION_MESSAGE);
 		target.setValue(str);
 	}
 
-	protected NLPTreeNode tree;
+	public void pruneTo(NLPTreeNode target)
+	{
+	}
+
+	public static void drag(int x, int y)
+	{
+		curX = x;
+		curY = y;
+	}
+
+	public NLPTreeNode tree;
 	public SentenceParser sentParser = new SentenceParser();
-	public static String savedStr;
-	public static int savedX, savedY;
+	public static NLPTreeNode savedNode;
+	//public static int savedX, savedY;
 	public static int curX, curY;
 	
 	public NLPTreeNode getTree() {
@@ -192,10 +204,25 @@ public class TreeJPanel extends JPanel {
 			g2.setColor(Color.yellow);
 			g2.fillRect(t.x, t.y, t.width, t.height);
 			g2.setColor(Color.black);
-		}
+		} else
+			if (savedNode != null && savedNode != t)
+			{
+				g2.setColor(Color.red);
+				g2.fillRect(t.x, t.y, t.width, t.height);
+				g2.setColor(Color.black);
+			} else
+				if (savedNode == t)
+				{
+					g2.setColor(Color.pink);
+					g2.fillRect(t.x, t.y, t.width, t.height);
+					g2.setColor(Color.black);
+				} 
 
 		// draw root
 		g2.drawString(nodeStr, (float) (nodeTab + start.getX()), (float) (start.getY() + nodeAscent));
+
+		if (savedNode != null)
+			g2.drawLine(savedNode.x + savedNode.width / 2, savedNode.y + savedNode.height / 2, curX, curY);
 		
 		//JOptionPane.showMessageDialog(null, nodeStr, "haha", JOptionPane.INFORMATION_MESSAGE);
 	

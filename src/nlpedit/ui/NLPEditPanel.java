@@ -150,6 +150,31 @@ public class NLPEditPanel extends JPanel
 				editPanelMouseMoved(e);
 			}
 		});
+
+		editPanel.addMouseMotionListener(new MouseAdapter()
+		{
+			public void mouseDragged(MouseEvent e)
+			{
+				editPanelMouseDragged(e);
+			}
+		});
+
+		editPanel.addMouseListener(new MouseAdapter()
+		{
+			public void mousePressed(MouseEvent e)
+			{
+				editPanelMousePressed(e);
+			}
+		});
+
+		editPanel.addMouseListener(new MouseAdapter()
+		{
+			public void mouseReleased(MouseEvent e)
+			{
+				editPanelMouseReleased(e);
+			}
+		});
+
 		editPanel.addMouseListener(new MouseAdapter()
 		{
 			public void mouseClicked(MouseEvent e)
@@ -312,15 +337,54 @@ public class NLPEditPanel extends JPanel
 		//JOptionPane.showMessageDialog(null, editPanel.curX + " " + editPanel.curY, "bsbs", JOptionPane.INFORMATION_MESSAGE);
 	}
 
+	private void editPanelMouseDragged(MouseEvent e)
+	{
+		if (project == null || project.getSentenceCount() == 0 || editPanel.savedNode == null)
+			return ;
+
+		editPanel.drag(e.getX(), e.getY());
+
+		editPanel.repaint();
+
+		//JOptionPane.showMessageDialog(null, editPanel.curX + " " + editPanel.curY, "bsbs", JOptionPane.INFORMATION_MESSAGE);
+	}
+
 	private void editPanelMouseClicked(MouseEvent e)
 	{
-		if (project == null || project.getSentenceCount() == 0)
+		if (project == null || project.getSentenceCount() == 0 || editPanel.tree.find(e.getX(), e.getY()) == null)
 			return ;
 
 		String str = JOptionPane.showInputDialog(null, "Attribute Change", "");
-		editPanel.change(e.getX(), e.getY(), str);
-		repaint();
+		if (str == null || str == "")
+			return ;
+		//JOptionPane.showMessageDialog(null, str, "haha0", JOptionPane.INFORMATION_MESSAGE);
+		editPanel.changeStr(e.getX(), e.getY(), str);
+		editPanel.repaint();
 
+		//JOptionPane.showMessageDialog(null, e.getX() + " " + e.getY() + " " + editPanel.curX + " " + editPanel.curY, "sbsb", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	private void editPanelMousePressed(MouseEvent e)
+	{
+		NLPTreeNode tmp;
+		if (project == null || project.getSentenceCount() == 0 || (tmp = editPanel.tree.find(e.getX(), e.getY())) == null)
+			return ;
+
+		editPanel.savedNode = tmp;
+		//JOptionPane.showMessageDialog(null, e.getX() + " " + e.getY() + " " + editPanel.curX + " " + editPanel.curY, "sbsb", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	private void editPanelMouseReleased(MouseEvent e)
+	{
+		NLPTreeNode tmp;
+		if (project == null || project.getSentenceCount() == 0 || (tmp = editPanel.tree.find(e.getX(), e.getY())) == null)
+			return ;
+
+		editPanel.pruneTo(tmp);
+
+		editPanel.savedNode = null;
+
+		editPanel.repaint();
 		//JOptionPane.showMessageDialog(null, e.getX() + " " + e.getY() + " " + editPanel.curX + " " + editPanel.curY, "sbsb", JOptionPane.INFORMATION_MESSAGE);
 	}
 
