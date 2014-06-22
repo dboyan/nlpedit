@@ -84,6 +84,7 @@ public class NLPProject {
 
 	private void initialize() {
 		setupBoundaries();
+		treeArray = new Vector<NLPTreeNode>();
 		statusListeners = new Vector<ParseStatusListener>();
 		finishListeners = new Vector<ParseFinishListener>();
 	}
