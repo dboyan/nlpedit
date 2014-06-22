@@ -2,14 +2,17 @@ package nlpedit.ui;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.Serializable;
+import javax.swing.JOptionPane;
 
 import edu.stanford.nlp.trees.Tree;
 
 public class NLPTreeNode extends DefaultMutableTreeNode implements Serializable
 {
+	public int x, y, height, width;
+	
 	public NLPTreeNode(Tree root) {
 		super(root.value());
-
+		
 		int childs = root.numChildren();
 		for (int i = 0; i < childs; i++) {
 			add(new NLPTreeNode(root.getChild(i)));
@@ -18,6 +21,17 @@ public class NLPTreeNode extends DefaultMutableTreeNode implements Serializable
 
 	public NLPTreeNode(String name) {
 		super(name);
+	}
+
+	public String value()
+	{
+		return (String)userObject;
+	}
+
+	@Override
+	public NLPTreeNode getChildAt(int i)
+	{
+		return (NLPTreeNode)super.getChildAt(i);
 	}
 
 	public String getTreeString() {

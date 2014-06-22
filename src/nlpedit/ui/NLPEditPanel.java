@@ -42,6 +42,7 @@ import javax.swing.JButton;
 import javax.swing.JProgressBar;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+import javax.swing.JOptionPane;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.objectbank.TokenizerFactory;
@@ -55,7 +56,8 @@ public class NLPEditPanel extends JPanel
 	   			     ParseFinishListener {
 	private NLPProject project;
 	private JTextPane textPane;
-	private TreeJPanel editPanel; // TODO
+	private TreeJPanel editPanel;
+
 	private JLabel statusLabel;
 	private JProgressBar progressBar;
 	private SimpleAttributeSet normalStyle, highlightStyle;
@@ -217,6 +219,9 @@ public class NLPEditPanel extends JPanel
 		textPane.setCaretPosition(currentPos);
 		highlightSentenceID(id);
 		refreshNavigator();
+		String str = project.getDocument().substring(info.getBeginPos(), info.getEndPos() + 1);
+		JOptionPane.showMessageDialog(null, str, "hehe", JOptionPane.INFORMATION_MESSAGE);
+		editPanel.displaySentence(str);
 	}
 
 	public void reparseAll() {

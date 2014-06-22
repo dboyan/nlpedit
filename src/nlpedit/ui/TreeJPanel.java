@@ -4,8 +4,19 @@ import edu.stanford.nlp.ling.StringLabelFactory;
 import edu.stanford.nlp.trees.LabeledScoredTreeFactory;
 import edu.stanford.nlp.trees.PennTreeReader;
 import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.objectbank.TokenizerFactory;
+import edu.stanford.nlp.process.CoreLabelTokenFactory;
+import edu.stanford.nlp.process.PTBTokenizer;
+import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
+import edu.stanford.nlp.parser.lexparser.LexicalizedParserQuery;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.objectbank.TokenizerFactory;
+
 
 import javax.swing.*;
+import java.io.StringReader;
+import java.awt.Container;
+import java.util.List;
 
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -46,32 +57,38 @@ public class TreeJPanel extends JPanel {
 			this.nodeTab = nodeTab;
 			this.nodeCenter = nodeCenter;
 			this.childTab = childTab;
+		}
 	}
-}
 
 
-	protected Tree tree;
-	protected NLPTreeNode mtree;
-
-	public Tree getTree() {
+	protected NLPTreeNode tree;
+	public SentenceParser sentParser;
+	
+	public NLPTreeNode getTree() {
 		return tree;
 	}
 
-	public void setTree(Tree tree) {
+	public void setTree(NLPTreeNode tree) {
 		this.tree = tree;
-		this.mtree = new NLPTreeNode(tree);
 		repaint();
 	}
 
-	protected static String nodeToString(Tree t) {  
+	public void displaySentence(String sent)
+	{
+		if (sent == "")
+			return ; 
+		setTree(sentParser.parse(sent));
+	}
+
+	protected static String nodeToString(NLPTreeNode t) {  
 		return (t == null || t.value() == null) ? " " : t.value();
 	}
 
-	protected static double width(Tree tree, FontMetrics fM) {
+	protected static double width(NLPTreeNode tree, FontMetrics fM) {
 		return widthResult(tree, fM).width;
 	}
 
-	protected static WidthResult widthResult(Tree tree, FontMetrics fM) {
+	protected static WidthResult widthResult(NLPTreeNode tree, FontMetrics fM) {
 		if (tree == null) {
 			return new WidthResult(0.0, 0.0, 0.0, 0.0);
 		}
@@ -82,8 +99,8 @@ public class TreeJPanel extends JPanel {
 		double sub = 0.0;
 		double nodeCenter = 0.0;
 		//double childTab = 0.0;
-		for (int i = 0, numKids = tree.numChildren(); i < numKids; i++) {
-			WidthResult subWR = widthResult(tree.getChild(i), fM);
+		for (int i = 0, numKids = tree.getChildCount(); i < numKids; i++) {
+			WidthResult subWR = widthResult(tree.getChildAt(i), fM);
 			if (i == 0) {
 				nodeCenter += (sub + subWR.nodeCenter) / 2.0;
 			}
@@ -105,15 +122,15 @@ public class TreeJPanel extends JPanel {
 			nodeCenter + totalLeft - subLeft, totalLeft - subLeft);
 	}
 
-	protected static double height(Tree tree, FontMetrics fM) {
+	protected static double height(NLPTreeNode tree, FontMetrics fM) {
 		if (tree == null) {
 			return 0.0;
 		}
-		double depth = tree.depth();
+		double depth = tree.getLevel();
 		return fM.getHeight() * (1.0 + depth * (1.0 + parentSkip + aboveLineSkip + belowLineSkip));
 	}
 
-	protected FontMetrics pickFont(Graphics2D g2, Tree tree, Dimension space) {
+	protected FontMetrics pickFont(Graphics2D g2, NLPTreeNode tree, Dimension space) {
 		Font font = g2.getFont();
 		String fontName = font.getName();
 		int style = font.getStyle();
@@ -137,7 +154,11 @@ public class TreeJPanel extends JPanel {
 	}
 
 
-	private static double paintTree(Tree t, Point2D start, Graphics2D g2, FontMetrics fM) {
+	private static double paintTree(NLPTreeNode t, Point2D start, Graphics2D g2, FontMetrics fM) {
+		
+		JOptionPane.showMessageDialog(null, "fuck", "haha", JOptionPane.INFORMATION_MESSAGE);
+	
+
 		if (t == null) {
 			return 0.0;
 		}
@@ -153,6 +174,9 @@ public class TreeJPanel extends JPanel {
 		//double treeHeight = height(t, fM);
 		// draw root
 		g2.drawString(nodeStr, (float) (nodeTab + start.getX()), (float) (start.getY() + nodeAscent));
+		
+		JOptionPane.showMessageDialog(null, nodeStr, "haha", JOptionPane.INFORMATION_MESSAGE);
+	
 		if (t.isLeaf()) {
 			return nodeWidth;
 		}
@@ -164,15 +188,15 @@ public class TreeJPanel extends JPanel {
 		double lineStartY = start.getY() + nodeHeight * (1.0 + belowLineSkip);
 		double lineEndY = lineStartY + nodeHeight * parentSkip;
 		// recursively draw children
-		for (int i = 0; i < t.children().length; i++) {
-			Tree child = t.children()[i];
+		for (int i = 0; i < t.getChildCount(); i++) {
+			NLPTreeNode child = t.getChildAt(i);
 			double cWidth = paintTree(child, new Point2D.Double(childStartX, childStartY), g2, fM);
 			// draw connectors
 			wr = widthResult(child, fM);
 			double lineEndX = childStartX + wr.nodeCenter;
 			g2.draw(new Line2D.Double(lineStartX, lineStartY, lineEndX, lineEndY));
 			childStartX += cWidth;
-			if (i < t.children().length - 1) {
+			if (i < t.getChildCount() - 1) {
 				childStartX += sisterSkip * fM.stringWidth(" ");
 			}
 		}
@@ -238,32 +262,46 @@ public class TreeJPanel extends JPanel {
 		return new Font(fontName, style, size);
 	}
 
-	public Dimension getTreeDimension(Tree tree, Font font) {
+	public Dimension getTreeDimension(NLPTreeNode tree, Font font) {
 		FontMetrics fM = getFontMetrics(font);
 		return new Dimension((int) width(tree, fM), (int) height(tree, fM));
 	}
 
+	/*
+	public void parseSentence(String sent) {
+		if (sent.equals("")){
+			return ;
+		}
+		TokenizerFactory<CoreLabel> tokenizerFactory;
+		List<CoreLabel> rawWords = tokenizerFactory.getTokenizer(new StringReader(sent)).tokenize();
+		lpq.parse(rawWords);
+		Tree parse = lpq.getBestParse();
+		treeEdit.setTree(parse);
+	}
+	*/
+
 	public static void main(String[] args) throws IOException {
+		/*
 		TreeJPanel tjp = new TreeJPanel();
 		// String ptbTreeString1 = "(ROOT (S (NP (DT This)) (VP (VBZ is) (NP (DT a) (NN test))) (. .)))";
 		String ptbTreeString = "(ROOT (S (NP (NNP Interactive_Tregex)) (VP (VBZ works)) (PP (IN for) (PRP me)) (. !))))";
 		if (args.length > 0) {
 			ptbTreeString = args[0];
 		}
-		Tree tree = (new PennTreeReader(new StringReader(ptbTreeString), new LabeledScoredTreeFactory(new StringLabelFactory()))).readTree();
+		NLPTreeNode tree = (new PennTreeReader(new StringReader(ptbTreeString), new LabeledScoredTreeFactory(new StringLabelFactory()))).readTree();
 		tjp.setTree(tree);
 		tjp.setBackground(Color.white);
 		JFrame frame = new JFrame();
 		frame.getContentPane().add(tjp, BorderLayout.CENTER);
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
-				public void windowClosing(WindowEvent e) {
-					System.exit(0);
+			public void windowClosing(WindowEvent e) {
+				System.exit(0);
 			}
 		});
 		frame.pack();
 		frame.setVisible(true);
-		frame.setVisible(true);
+		frame.setVisible(true);*/
 	}
 
 }
