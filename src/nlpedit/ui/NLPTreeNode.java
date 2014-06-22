@@ -1,10 +1,11 @@
 package nlpedit.ui;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.Serializable;
 
 import edu.stanford.nlp.trees.Tree;
 
-public class NLPTreeNode extends DefaultMutableTreeNode
+public class NLPTreeNode extends DefaultMutableTreeNode implements Serializable
 {
 	public NLPTreeNode(Tree root) {
 		super(root.value());

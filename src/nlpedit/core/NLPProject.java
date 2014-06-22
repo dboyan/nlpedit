@@ -56,6 +56,8 @@ public class NLPProject {
 
 	public NLPProject(String str) {
 		document = str;
+		setupBoundaries();
+		treeArray = new Vector<NLPTreeNode>();
 		initialize();
 	}
 
@@ -79,12 +81,11 @@ public class NLPProject {
 		boundaryArray = sForm.boundaryArray;
 		boundaryMap = sForm.boundaryMap;
 		treeArray = sForm.treeArray;
-		numSentence = treeArray.size() - 1;
+		numSentence = treeArray.size();
+		initialize();
 	}
 
 	private void initialize() {
-		setupBoundaries();
-		treeArray = new Vector<NLPTreeNode>();
 		statusListeners = new Vector<ParseStatusListener>();
 		finishListeners = new Vector<ParseFinishListener>();
 	}
@@ -204,23 +205,6 @@ public class NLPProject {
 		return parseSentence(document.substring(start, end));
 	}
 
-	class NLPProjectSerializedForm implements Serializable {
-		String document;
-		TreeMap<Integer, Integer> boundaryMap;
-		Vector<Integer> boundaryArray;
-		Vector<NLPTreeNode> treeArray;
-
-		public NLPProjectSerializedForm(String d,
-				TreeMap<Integer, Integer> bm,
-				Vector<Integer> ba,
-				Vector<NLPTreeNode> ta) {
-			document = d;
-			boundaryMap = bm;
-			boundaryArray = ba;
-			treeArray = ta;
-		}
-	}
-
 	class NLPParseAllWorker implements Runnable {
 		public void run() {
 			treeArray.clear();
@@ -234,6 +218,23 @@ public class NLPProject {
 				listener.parseFinished(new ParseFinishEvent(NLPProject.this));
 			}
 		}
+	}
+}
+
+class NLPProjectSerializedForm implements Serializable {
+	String document;
+	TreeMap<Integer, Integer> boundaryMap;
+	Vector<Integer> boundaryArray;
+	Vector<NLPTreeNode> treeArray;
+
+	public NLPProjectSerializedForm(String d,
+			TreeMap<Integer, Integer> bm,
+			Vector<Integer> ba,
+			Vector<NLPTreeNode> ta) {
+		document = d;
+		boundaryMap = bm;
+		boundaryArray = ba;
+		treeArray = ta;
 	}
 }
 
