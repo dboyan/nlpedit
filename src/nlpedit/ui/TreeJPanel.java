@@ -69,6 +69,7 @@ public class TreeJPanel extends JPanel {
 	}
 
 	public void setTree(NLPTreeNode tree) {
+		JOptionPane.showMessageDialog(null, tree.value(), "hoho", JOptionPane.INFORMATION_MESSAGE);
 		this.tree = tree;
 		repaint();
 	}
@@ -78,7 +79,8 @@ public class TreeJPanel extends JPanel {
 		if (sent == "")
 			return ; 
 		JOptionPane.showMessageDialog(null, sent, "hehe", JOptionPane.INFORMATION_MESSAGE);
-		setTree(sentParser.parse(sent));
+		JOptionPane.showMessageDialog(null, sent, "hehe2", JOptionPane.INFORMATION_MESSAGE);
+		setTree(sentParser.parse(this, sent));
 	}
 
 	protected static String nodeToString(NLPTreeNode t) {  
