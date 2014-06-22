@@ -80,7 +80,7 @@ public class TreeJPanel extends JPanel {
 			return ; 
 		//JOptionPane.showMessageDialog(null, sent, "hehe", JOptionPane.INFORMATION_MESSAGE);
 		//JOptionPane.showMessageDialog(null, sent, "hehe2", JOptionPane.INFORMATION_MESSAGE);
-		setTree(sentParser.parse(this, sent));
+		setTree(sentParser.parse(sent));
 	}
 
 	protected static String nodeToString(NLPTreeNode t) {  
@@ -129,7 +129,7 @@ public class TreeJPanel extends JPanel {
 		if (tree == null) {
 			return 0.0;
 		}
-		double depth = tree.getLevel();
+		double depth = tree.getDepth();
 		return fM.getHeight() * (1.0 + depth * (1.0 + parentSkip + aboveLineSkip + belowLineSkip));
 	}
 
@@ -175,7 +175,7 @@ public class TreeJPanel extends JPanel {
 		// draw root
 		g2.drawString(nodeStr, (float) (nodeTab + start.getX()), (float) (start.getY() + nodeAscent));
 		
-		JOptionPane.showMessageDialog(null, nodeStr, "haha", JOptionPane.INFORMATION_MESSAGE);
+		//JOptionPane.showMessageDialog(null, nodeStr, "haha", JOptionPane.INFORMATION_MESSAGE);
 	
 		if (t.isLeaf()) {
 			return nodeWidth;

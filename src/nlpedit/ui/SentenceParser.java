@@ -27,7 +27,7 @@ public class SentenceParser
 		tokenizerFactory = PTBTokenizer.factory(new CoreLabelTokenFactory(), "");	
 	}
 
-	public NLPTreeNode parse(JPanel p, String sent) {
+	public NLPTreeNode parse(String sent) {
 		/*File f = new File("G:/git/my2/nlpedit/build/jar/ca.txt");
 		f.createNewFile();
 		FileOutputStream fos = new FileOutputStream(f);

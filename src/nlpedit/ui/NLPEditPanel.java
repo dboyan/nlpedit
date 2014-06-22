@@ -55,8 +55,21 @@ public class NLPEditPanel extends JPanel
 			  implements ParseStatusListener, 
 	   			     ParseFinishListener {
 	private NLPProject project;
+	
 	private JTextPane textPane;
+	private JScrollPane textScrollPane;
+	
 	private TreeJPanel editPanel;
+	private JScrollPane editScrollPane;
+	
+	private JSplitPane splitPane;
+	private JPanel topPanel;
+	private JPanel buttonsPanel;
+	
+	private JButton prevButton;
+	private JButton nextButton;
+	
+	private JPanel statusPanel;
 
 	private JLabel statusLabel;
 	private JProgressBar progressBar;
@@ -91,13 +104,14 @@ public class NLPEditPanel extends JPanel
 		nextButton = new JButton();
 		textPane = new JTextPane();
 		textScrollPane = new JScrollPane();
-		editPanel = new TreeJPanel(); // TODO
+		editPanel = new TreeJPanel();
+		editScrollPane = new JScrollPane();
 		statusPanel = new JPanel();
 		statusLabel = new JLabel();
 
 		setLayout(new BorderLayout());
 
-		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		splitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
 		topPanel.setLayout(new BorderLayout());
 		buttonsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
@@ -127,12 +141,16 @@ public class NLPEditPanel extends JPanel
 				textPaneMouseClicked(e);
 			}
 		});
+
+		//editPanel
+
 		textScrollPane.setViewportView(textPane);
 		topPanel.add(textScrollPane, BorderLayout.CENTER);
 
+		editScrollPane.setViewportView(editPanel);
+		
 		splitPane.setLeftComponent(topPanel);
-
-		splitPane.setRightComponent(editPanel);
+		splitPane.setRightComponent(editScrollPane);
 		add(splitPane, BorderLayout.CENTER);
 
 		statusPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -279,12 +297,4 @@ public class NLPEditPanel extends JPanel
 		progressBar.setVisible(false);
 		statusLabel.setText("Ready");
 	}
-
-	private JScrollPane textScrollPane;
-	private JSplitPane splitPane;
-	private JPanel topPanel;
-	private JPanel buttonsPanel;
-	private JButton prevButton;
-	private JButton nextButton;
-	private JPanel statusPanel;
 }
