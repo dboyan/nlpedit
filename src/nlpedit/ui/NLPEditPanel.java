@@ -164,6 +164,22 @@ public class NLPEditPanel extends JPanel
 		}
 	}
 
+	public void openProject(File file) {
+		project = new NLPProject(file);
+		project.setupParser(lpq, tokenizerFactory);
+		project.addStatusListener(this);
+		project.addFinishListener(this);
+		textPane.setText(project.getDocument());
+
+		if (project.getSentenceCount() > 0) {
+			scrollToSentence(0);
+		}
+	}
+
+	public void saveProject(File file) {
+		project.saveToFile(file);
+	}
+
 	private void highlightSentencePos(int pos) {
 		NLPSentenceInfo info = project.getInfoFromPos(pos);
 		highlightSentence(info.getBeginPos(), info.getEndPos());

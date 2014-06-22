@@ -29,6 +29,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import java.io.File;
 
 public class NLPEditor extends JFrame {
 	private NLPEditPanel mainPanel;
@@ -50,6 +54,7 @@ public class NLPEditor extends JFrame {
 		menuBar = new JMenuBar();
 		fileMenu = new JMenu();
 		importTextItem = new JMenuItem();
+		openProjectItem = new JMenuItem();
 		saveProjectItem = new JMenuItem();
 		separatorItem1 = new JSeparator();
 		exitItem = new JMenuItem();
@@ -66,6 +71,13 @@ public class NLPEditor extends JFrame {
 			}
 		});
 		fileMenu.add(importTextItem);
+		openProjectItem.setText("Open Project");
+		openProjectItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				openProjectActionPerformed(e);
+			}
+		});
+		fileMenu.add(openProjectItem);
 		saveProjectItem.setText("Save Project");
 		saveProjectItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -104,6 +116,32 @@ public class NLPEditor extends JFrame {
 	}
 
 	protected void saveProjectActionPerformed(ActionEvent e) {
+		JFileChooser chooser = new JFileChooser();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter(
+			"Project File", "npj");
+		chooser.setFileFilter(filter);
+		int retval = chooser.showSaveDialog(this);
+		if (retval == JFileChooser.APPROVE_OPTION) {
+			String fPath = chooser.getSelectedFile().getAbsolutePath();
+			String fName = chooser.getSelectedFile().getName();
+			Pattern p = Pattern.compile("(.*)+\\.(npj)$");
+			Matcher m = p.matcher(fName);
+			if (!m.matches()) {
+				fPath = fPath + ".npj";
+			}
+			mainPanel.saveProject(new File(fPath));
+		}
+	}
+
+	protected void openProjectActionPerformed(ActionEvent e) {
+		JFileChooser chooser = new JFileChooser();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter(
+			"Project File", "npj");
+		chooser.setFileFilter(filter);
+		int retval = chooser.showOpenDialog(this);
+		if (retval == JFileChooser.APPROVE_OPTION) {
+			mainPanel.openProject(chooser.getSelectedFile());
+		}
 	}
 
 	protected void exitActionPerformed(ActionEvent e) {
@@ -121,6 +159,7 @@ public class NLPEditor extends JFrame {
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
 	private JMenuItem importTextItem;
+	private JMenuItem openProjectItem;
 	private JMenuItem saveProjectItem;
 	private JSeparator separatorItem1;
 	private JMenuItem exitItem;
