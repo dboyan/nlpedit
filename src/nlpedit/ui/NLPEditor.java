@@ -21,6 +21,8 @@ package nlpedit.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
@@ -58,6 +60,12 @@ public class NLPEditor extends JFrame {
 		saveProjectItem = new JMenuItem();
 		separatorItem1 = new JSeparator();
 		exitItem = new JMenuItem();
+		editMenu = new JMenu();
+		reparseAllItem = new JMenuItem();
+		reparseOneItem = new JMenuItem();
+		separatorItem2 = new JSeparator();
+		prevSentenceItem = new JMenuItem();
+		nextSentenceItem = new JMenuItem();
 		helpMenu = new JMenu();
 		aboutItem = new JMenuItem();
 
@@ -94,6 +102,37 @@ public class NLPEditor extends JFrame {
 		});
 		fileMenu.add(exitItem);
 		menuBar.add(fileMenu);
+		editMenu.setText("Edit");
+		reparseAllItem.setText("Reparse All");
+		reparseAllItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				reparseAllActionPerformed(e);
+			}
+		});
+		editMenu.add(reparseAllItem);
+		reparseOneItem.setText("Reparse Sentence");
+		reparseOneItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				reparseOneActionPerformed(e);
+			}
+		});
+		editMenu.add(reparseOneItem);
+		editMenu.add(separatorItem2);
+		prevSentenceItem.setText("Previous Sentence");
+		prevSentenceItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				prevSentenceActionPerformed(e);
+			}
+		});
+		editMenu.add(prevSentenceItem);
+		nextSentenceItem.setText("Next Sentence");
+		nextSentenceItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				nextSentenceActionPerformed(e);
+			}
+		});
+		editMenu.add(nextSentenceItem);
+		menuBar.add(editMenu);
 		helpMenu.setText("Help");
 		aboutItem.setText("About");
 		aboutItem.addActionListener(new ActionListener() {
@@ -145,6 +184,23 @@ public class NLPEditor extends JFrame {
 	}
 
 	protected void exitActionPerformed(ActionEvent e) {
+		System.exit(0);
+	}
+
+	protected void reparseAllActionPerformed(ActionEvent e) {
+		mainPanel.reparseAll();
+	}
+
+	protected void reparseOneActionPerformed(ActionEvent e) {
+		mainPanel.reparseCurrent();
+	}
+
+	protected void prevSentenceActionPerformed(ActionEvent e) {
+		mainPanel.scrollToPreviousSentence();
+	}
+
+	protected void nextSentenceActionPerformed(ActionEvent e) {
+		mainPanel.scrollToNextSentence();
 	}
 
 	protected void aboutActionPerformed(ActionEvent e) {
@@ -163,6 +219,12 @@ public class NLPEditor extends JFrame {
 	private JMenuItem saveProjectItem;
 	private JSeparator separatorItem1;
 	private JMenuItem exitItem;
+	private JMenu editMenu;
+	private JMenuItem reparseAllItem;
+	private JMenuItem reparseOneItem;
+	private JSeparator separatorItem2;
+	private JMenuItem prevSentenceItem;
+	private JMenuItem nextSentenceItem;
 	private JMenu helpMenu;
 	private JMenuItem aboutItem;
 

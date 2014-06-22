@@ -100,6 +100,11 @@ public class NLPProject {
 		worker.start();
 	}
 
+	public void parseOneSentence(int id) {
+		Thread worker = new Thread(new NLPParseOneWorker(id));
+		worker.start();
+	}
+
 	public String getDocument() {
 		return document;
 	}
@@ -213,6 +218,23 @@ public class NLPProject {
 				for (ParseStatusListener listener: statusListeners) {
 					listener.parseStatusEmitted(new ParseStatusEvent(i + 1, NLPProject.this));
 				}
+			}
+			for (ParseFinishListener listener : finishListeners) {
+				listener.parseFinished(new ParseFinishEvent(NLPProject.this));
+			}
+		}
+	}
+
+	class NLPParseOneWorker implements Runnable {
+		private int id;
+
+		public NLPParseOneWorker(int i) {
+			id = i;
+		}
+
+		public void run() {
+			if (id < numSentence) {
+				treeArray.setElementAt(parseSentenceID(id), id);
 			}
 			for (ParseFinishListener listener : finishListeners) {
 				listener.parseFinished(new ParseFinishEvent(NLPProject.this));

@@ -152,7 +152,10 @@ public class NLPEditPanel extends JPanel
 		project.addStatusListener(this);
 		project.addFinishListener(this);
 		textPane.setText(project.getDocument());
+		parseAll();
+	}
 
+	private void parseAll() {
 		progressBar.setMaximum(project.getSentenceCount());
 		progressBar.setValue(0);
 		statusLabel.setText("Parsing (0 of " + project.getSentenceCount() + ")");
@@ -216,12 +219,29 @@ public class NLPEditPanel extends JPanel
 		refreshNavigator();
 	}
 
+	public void reparseAll() {
+		if (project != null) {
+			parseAll();
+		}
+	}
+
+	public void reparseCurrent() {
+		if (project != null) {
+			statusLabel.setText("Parsing...");
+			project.parseOneSentence(currentSentence);
+		}
+	}
+
 	public void scrollToPreviousSentence() {
-		scrollToSentence(currentSentence - 1);
+		if (currentSentence > 0) {
+			scrollToSentence(currentSentence - 1);
+		}
 	}
 
 	public void scrollToNextSentence() {
-		scrollToSentence(currentSentence + 1);
+		if (currentSentence < project.getSentenceCount() - 1) {
+			scrollToSentence(currentSentence + 1);
+		}
 	}
 
 	private void prevActionPerformed(ActionEvent e) {
