@@ -55,7 +55,7 @@ public class NLPEditPanel extends JPanel
 	   			     ParseFinishListener {
 	private NLPProject project;
 	private JTextPane textPane;
-	private JPanel editPanel; // TODO
+	private NLPTreeEdit editPanel; // TODO
 	private JLabel statusLabel;
 	private JProgressBar progressBar;
 	private SimpleAttributeSet normalStyle, highlightStyle;
@@ -65,6 +65,7 @@ public class NLPEditPanel extends JPanel
 	private TokenizerFactory<CoreLabel> tokenizerFactory;
 
 	private int currentPos, currentSentence;
+	private boolean parsingInProgress = false;
 
 	public NLPEditPanel() {
 		buildGUI();
@@ -89,7 +90,7 @@ public class NLPEditPanel extends JPanel
 		nextButton = new JButton();
 		textPane = new JTextPane();
 		textScrollPane = new JScrollPane();
-		editPanel = new JPanel(); // TODO
+		editPanel = new NLPTreeEdit(); // TODO
 		statusPanel = new JPanel();
 		statusLabel = new JLabel();
 
@@ -158,6 +159,7 @@ public class NLPEditPanel extends JPanel
 		statusLabel.setText("Parsing (0 of " + project.getSentenceCount() + ")");
 		progressBar.setVisible(true);
 
+		parsingInProgress = true;
 		project.parseAll();
 		if (project.getSentenceCount() > 0) {
 			scrollToSentence(0);
@@ -214,6 +216,10 @@ public class NLPEditPanel extends JPanel
 		textPane.setCaretPosition(currentPos);
 		highlightSentenceID(id);
 		refreshNavigator();
+
+		if (!parsingInProgress) {
+			editPanel.setTree(project.getTree(id));
+		}
 	}
 
 	public void scrollToPreviousSentence() {
@@ -253,6 +259,7 @@ public class NLPEditPanel extends JPanel
 	public void parseFinished(ParseFinishEvent e) {
 		progressBar.setVisible(false);
 		statusLabel.setText("Ready");
+		parsingInProgress = false;
 	}
 
 	private JScrollPane textScrollPane;

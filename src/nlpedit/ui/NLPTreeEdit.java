@@ -42,6 +42,10 @@ public class NLPTreeEdit extends JPanel {
 		treePanel.setTree(root);
 	}
 
+	public void setTree(NLPTreeNode root) {
+		treePanel.setTree(root);
+	}
+
 	public String getTreeString() {
 		return treePanel.getTreeString();
 	}

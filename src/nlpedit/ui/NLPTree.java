@@ -74,6 +74,11 @@ public class NLPTree extends JPanel {
 		tree.setModel(treeModel);
 	}
 
+	public void setTree(NLPTreeNode root) {
+		treeModel = new DefaultTreeModel(root);
+		tree.setModel(treeModel);
+	}
+
 	public String getTreeString() {
 		NLPTreeNode p = (NLPTreeNode)treeModel.getRoot();
 		return p.getTreeString();
